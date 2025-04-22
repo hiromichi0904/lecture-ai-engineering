@@ -11,7 +11,7 @@ from config import MODEL_NAME
 from huggingface_hub import HfFolder
 
 # --- アプリケーション設定 ---
-st.set_page_config(page_title="Gemma Chatbot", layout="wide")
+st.set_page_config(page_title="Gemma 3 Chatbot", layout="wide")
 
 # --- 初期化処理 ---
 # NLTKデータのダウンロード（初回起動時など）
@@ -46,12 +46,20 @@ def load_model():
 pipe = llm.load_model()
 
 # --- Streamlit アプリケーション ---
-st.title("🤖 Gemma 2 Chatbot with Feedback")
-st.write("Gemmaモデルを使用したチャットボットです。回答に対してフィードバックを行えます。")
-st.markdown("---")
+st.title("🤖 Gemma 3 Chatbot with Feedback")
+st.write("Gemmaモデルを使用したチャットボットです。")
+st.markdown("> ヒント 質問を入力して送信ボタンを押してみてください！")
 
 # --- サイドバー ---
 st.sidebar.title("ナビゲーション")
+
+prompt_templates = {
+    "標準": "以下の質問に答えてください：{question}",
+    "やさしい解説": "小学生にもわかるように説明してください：{question}",
+    "専門的に": "専門的な視点で詳しく答えてください：{question}",
+}
+template_choice = st.sidebar.selectbox("応答スタイル", list(prompt_templates.keys()))
+
 # セッション状態を使用して選択ページを保持
 if 'page' not in st.session_state:
     st.session_state.page = "チャット" # デフォルトページ
@@ -64,6 +72,8 @@ page = st.sidebar.radio(
     on_change=lambda: setattr(st.session_state, 'page', st.session_state.page_selector) # 選択変更時に状態を更新
 )
 
+st.session_state["template_choice"] = template_choice
+st.session_state["prompt_templates"] = prompt_templates
 
 # --- メインコンテンツ ---
 if st.session_state.page == "チャット":
@@ -78,4 +88,4 @@ elif st.session_state.page == "サンプルデータ管理":
 
 # --- フッターなど（任意） ---
 st.sidebar.markdown("---")
-st.sidebar.info("開発者: [Your Name]")
+st.sidebar.info("開発者: H. Okon")

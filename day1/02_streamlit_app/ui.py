@@ -30,8 +30,13 @@ def display_chat_page(pipe):
         st.session_state.current_answer = "" # 回答をリセット
         st.session_state.feedback_given = False # フィードバック状態もリセット
 
+        templates = st.session_state.get("prompt_templates", {})
+        choice = st.session_state.get("template_choice", "標準")
+        template = templates.get(choice, "以下の質問に答えてください：{question}")
+        final_prompt = template.format(question=user_question)
+
         with st.spinner("モデルが回答を生成中..."):
-            answer, response_time = generate_response(pipe, user_question)
+            answer, response_time = generate_response(pipe, final_prompt)
             st.session_state.current_answer = answer
             st.session_state.response_time = response_time
             # ここでrerunすると回答とフィードバックが一度に表示される
