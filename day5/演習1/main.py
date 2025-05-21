@@ -10,6 +10,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import LabelEncoder
 from mlflow.models.signature import infer_signature
+import time
+
 
 
 # データ準備
@@ -117,7 +119,9 @@ if __name__ == "__main__":
 
     model_dir = "models"
     os.makedirs(model_dir, exist_ok=True)
-    model_path = os.path.join(model_dir, f"titanic_model.pkl")
+    current_time = time.localtime()
+    time_info = time.strftime("%Y-%m-%d_%H-%M-%S", current_time)
+    model_path = os.path.join(model_dir, f"titanic_model_{time_info}.pkl")
     with open(model_path, "wb") as f:
         pickle.dump(model, f)
     print(f"モデルを {model_path} に保存しました")

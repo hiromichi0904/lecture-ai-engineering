@@ -11,11 +11,17 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
+import time
+
 
 # テスト用データとモデルパスを定義
 DATA_PATH = os.path.join(os.path.dirname(__file__), "../data/Titanic.csv")
 MODEL_DIR = os.path.join(os.path.dirname(__file__), "../models")
 MODEL_PATH = os.path.join(MODEL_DIR, "titanic_model.pkl")
+# current_time = time.localtime()
+# time_info = time.strftime("%Y-%m-%d_%H-%M-%S", current_time)
+# MODEL_PATH = os.path.join(MODEL_DIR, f"titanic_model_{time_info}.pkl")
+PREVIOUS_MODEL_PATH = os.path.join(MODEL_DIR, "titanic_model_2025-05-21_01-36-20.pkl")
 
 
 @pytest.fixture
@@ -171,3 +177,30 @@ def test_model_reproducibility(sample_data, preprocessor):
     assert np.array_equal(
         predictions1, predictions2
     ), "モデルの予測結果に再現性がありません"
+
+
+def load_previous_model():
+    """過去のモデルを読み込む"""
+    with open(PREVIOUS_MODEL_PATH, "rb") as f:
+        return pickle.load(f)
+
+
+def test_model_comparison(train_model):
+    """新旧モデルを比較して性能劣化がないか確認"""
+    model, X_test, y_test = train_model
+
+    # 新しいモデルの予測
+    y_pred_new = model.predict(X_test)
+    accuracy_new = accuracy_score(y_test, y_pred_new)
+
+    # 過去のモデルを読み込む
+    previous_model = load_previous_model()
+
+    # 過去のモデルの予測
+    y_pred_old = previous_model.predict(X_test)
+    accuracy_old = accuracy_score(y_test, y_pred_old)
+
+    # 精度の比較（過去モデルと新しいモデルの差が小さいことを確認）
+    assert (
+        abs(accuracy_new - accuracy_old) < 0.05
+    ), f"二つのモデルで精度に大きな差があります: 新 {accuracy_new}, 古 {accuracy_old}"
