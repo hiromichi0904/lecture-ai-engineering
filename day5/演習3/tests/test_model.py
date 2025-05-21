@@ -201,4 +201,4 @@ def test_model_comparison(train_model):
     accuracy_old = accuracy_score(y_test, y_pred_old)
 
     # 精度の比較（過去モデルと新しいモデルの差が小さいことを確認）
-    assert abs(accuracy_new - accuracy_old) < 0.05, f"二つのモデルで精度に大きな差があります: 新 {accuracy_new}, 古 {acuracy_old}"
+    assert abs(accuracy_new - accuracy_old) < 0.05, f"二つのモデルで精度に大きな差があります: 新 {accuracy_new}, 古 {accuracy_old}"
